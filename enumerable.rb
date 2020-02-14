@@ -29,8 +29,14 @@ module Enumerable
     end
     new_array
   end
+
+  #definition of the my_all? method
+  def my_all?
+    for element in self do
+      return false unless yield(element)
+    end
+    true
+  end
+
 end
-
-dogs= ["Gordis", "Chiquis", "Goro", "Duquesa", "Fenriz", "Ital", "Lemmy", "Pinpin"]
-
 
