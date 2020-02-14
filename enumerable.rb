@@ -32,11 +32,20 @@ module Enumerable
 
   #definition of the my_all? method
   def my_all?
+    return true unless block_given? #no block given?, then return true
     for element in self do
       return false unless yield(element)
     end
     true
   end
 
-end
+  #definition of the my_none? method
+  def my_none?
+    return false unless block_given? #no block given?, then return false
+    for element in self do
+      return false if yield(element)
+    end
+    true
+  end
 
+end
