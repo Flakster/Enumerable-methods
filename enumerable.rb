@@ -48,4 +48,19 @@ module Enumerable
     true
   end
 
+  #definition of the my_any? method
+  def my_any?
+    if block_given?
+      for element in self do
+        return true if yield(element)
+      end
+      false
+    else
+      for element in self do
+        return true if element
+      end
+      false
+    end
+  end
+
 end
