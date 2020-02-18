@@ -1,11 +1,15 @@
 #!/usr/bin/env ruby
-module Enumerable
 
+# frozen_string_literal: true
+
+# Some methods will be added to this module
+module Enumerable
   # definition of the my_each method
 
   def my_each
-    return to_enum(:my_each) unless block_given? #no block given?, then return an enumerator
-    for element in self do # rubocop:disable Style/For 
+    return to_enum(:my_each) unless block_given?
+
+    for element in self do # rubocop:disable Style/For
       yield(element)
     end
     self
@@ -14,11 +18,12 @@ module Enumerable
   # definition of the my_each_with_index method
 
   def my_each_with_index
-    return to_enum(:my_each) unless block_given? #no block given?, then return an enumerator
-    index=0
-    for element in self do # rubocop:disable Style/For
-      yield(element,index)
-      index+=1
+    return to_enum(:my_each_with_index) unless block_given?
+
+    index = 0
+    my_each do |element|
+      yield(element, index)
+      index += 1
     end
     self
   end
@@ -26,9 +31,10 @@ module Enumerable
   # definition of the my_select method
 
   def my_select
-    return to_enum(:my_each) unless block_given? #no block given?, then return an enumerator
-    new_array=[]
-    self.my_each do |element|
+    return to_enum(:my_select) unless block_given?
+
+    new_array = []
+    my_each do |element|
       new_array << element if yield(element)
     end
     new_array
@@ -37,7 +43,8 @@ module Enumerable
   # definition of the my_all? method
 
   def my_all?
-    return true unless block_given? # no block given?, then return true
+    return true unless block_given?
+
     for element in self do # rubocop:disable Style/For
       return false unless yield(element)
     end
@@ -47,7 +54,8 @@ module Enumerable
   # definition of the my_none? method
 
   def my_none?
-    return false unless block_given? # no block given?, then return false
+    return false unless block_given?
+
     for element in self do # rubocop:disable Style/For
       return false if yield(element)
     end
@@ -61,31 +69,44 @@ module Enumerable
       for element in self do # rubocop:disable Style/For
         return true if yield(element)
       end
-      false
     else
       for element in self do # rubocop:disable Style/For
         return true if element
       end
-      false
     end
+    false
   end
 
   # definition of the my_count method
 
-  def my_count(*args) # method accepts cero or 1 arguments
-    raise ArgumentError.new("wrong number of arguments (given #{args.length}, expected 1)") if args.length > 1
-    num=0
-    if args.length >0 && block_given?
-      warn "#{__FILE__}:#{__LINE__}: Warning: given block not used"
+  def my_count(*args)
+    args.length > 1 &&
+      (raise ArgumentError, "Too much args.: #{args.length}, max.: 1)")
+    total = 0
+    if args.empty?
+      return length unless block_given?
+
+      my_each { |element| total += 1 if yield(element) }
+    else
+      my_each { |element| total += 1 if element == args[0] }
     end
-    for element in self do # rubocop:disable Style/For
-      if args.length > 0
-        num+=1 if element == args[0]
-      else
-        num+=1 if yield(element)
-      end
+    total
+  end
+
+  # definition of the my_map method
+
+  def my_map
+    return to_enum(:my_map) unless block_given?
+
+    new_array=[]
+    my_each do  |element|
+      new_array << yield(element)
     end
-    num
-  end 
+    new_array
+  end
 
 end
+
+hash = [1,2,3]
+print hash.my_map
+puts
