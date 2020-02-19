@@ -132,9 +132,3 @@ module Enumerable
     memo
   end
 end
-
-# definition of the multiply_els method
-
-def multiply_els(array)
-  array.my_inject(:*)
-end
