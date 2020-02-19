@@ -97,7 +97,6 @@ module Enumerable
 
   def my_map(arg_proc = nil)
     unless arg_proc.nil?
-      puts "arg_proc reveived"
       new_array = []
       my_each do  |element|
         new_array << arg_proc.call(element)
