@@ -96,14 +96,18 @@ module Enumerable
   # definition of the my_map method
 
   def my_map(arg_proc = nil)
+    new_array = []
     unless arg_proc.nil?
-      new_array = []
       my_each do  |element|
         new_array << arg_proc.call(element)
       end
       new_array
     else
-      return to_enum(:my_map)
+      return to_enum(:my_map) unless block_given?
+      my_each do  |element|
+        new_array << yield(element)
+      end
+      new_array
     end
   end
 
