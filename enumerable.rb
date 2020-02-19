@@ -95,14 +95,17 @@ module Enumerable
 
   # definition of the my_map method
 
-  def my_map
-    return to_enum(:my_map) unless block_given?
-
-    new_array = []
-    my_each do  |element|
-      new_array << yield(element)
+  def my_map(arg_proc = nil)
+    unless arg_proc.nil?
+      puts "arg_proc reveived"
+      new_array = []
+      my_each do  |element|
+        new_array << arg_proc.call(element)
+      end
+      new_array
+    else
+      return to_enum(:my_map)
     end
-    new_array
   end
 
   # definition of the my_inject method
@@ -142,8 +145,8 @@ module Enumerable
   end
 end
 
-  # definition of the multiply_els method
+# definition of the multiply_els method
 
-  def multiply_els(array)
-    array.my_inject(:*)
-  end
+def multiply_els(array)
+  array.my_inject(:*)
+end
