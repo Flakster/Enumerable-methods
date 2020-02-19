@@ -98,15 +98,52 @@ module Enumerable
   def my_map
     return to_enum(:my_map) unless block_given?
 
-    new_array=[]
+    new_array = []
     my_each do  |element|
       new_array << yield(element)
     end
     new_array
   end
 
+  # definition of the my_inject method
+
+  def my_inject(initial = nil, method = nil)
+    memo = first
+    initial_given = false
+    if !initial.nil? && initial.class != Symbol
+      memo = initial
+      initial_given = true
+    end
+    initial.class == Symbol && method.nil? && method = initial
+    unless method.nil?
+      case method
+      when :+
+        method_proc = proc { |acum, n| acum + n }
+      when :-
+        method_proc = proc { |acum, n| acum - n }
+      when :*
+        method_proc = proc { |acum, n| acum * n }
+      when :/
+        method_proc = proc { |acum, n| acum / n }
+      when :**
+        method_proc = proc { |acum, n| acum**n }
+      end
+    end
+    my_each_with_index do |element, index|
+      unless index.zero? && !initial_given
+        memo =  if block_given?
+                  yield(memo, element)
+                else
+                    method_proc.call(memo, element)
+                end
+      end
+    end
+    memo
+  end
 end
 
-hash = [1,2,3]
-print hash.my_map
-puts
+  # definition of the multiply_els method
+
+  def multiply_els(array)
+    array.my_inject(:*)
+  end
