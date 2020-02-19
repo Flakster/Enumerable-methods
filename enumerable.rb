@@ -45,7 +45,7 @@ module Enumerable
   def my_all?
     return true unless block_given?
 
-    for element in self do # rubocop:disable Style/For
+    my_each do |element|
       return false unless yield(element)
     end
     true
@@ -56,7 +56,7 @@ module Enumerable
   def my_none?
     return false unless block_given?
 
-    for element in self do # rubocop:disable Style/For
+    my_each do |element|
       return false if yield(element)
     end
     true
@@ -66,11 +66,11 @@ module Enumerable
 
   def my_any?
     if block_given?
-      for element in self do # rubocop:disable Style/For
+      my_each do |element|
         return true if yield(element)
       end
     else
-      for element in self do # rubocop:disable Style/For
+      my_each do |element|
         return true if element
       end
     end
@@ -97,51 +97,36 @@ module Enumerable
 
   def my_map(arg_proc = nil)
     new_array = []
-    unless arg_proc.nil?
-      my_each do  |element|
-        new_array << arg_proc.call(element)
-      end
-      new_array
-    else
+    if arg_proc.nil?
       return to_enum(:my_map) unless block_given?
+
       my_each do  |element|
         new_array << yield(element)
       end
-      new_array
+    else
+      my_each do  |element|
+        new_array << arg_proc.call(element)
+      end
     end
+    new_array
   end
 
   # definition of the my_inject method
 
-  def my_inject(initial = nil, method = nil)
+  def my_inject(initial = nil, operator = nil)
     memo = first
     initial_given = false
     if !initial.nil? && initial.class != Symbol
       memo = initial
       initial_given = true
     end
-    initial.class == Symbol && method.nil? && method = initial
-    unless method.nil?
-      case method
-      when :+
-        method_proc = proc { |acum, n| acum + n }
-      when :-
-        method_proc = proc { |acum, n| acum - n }
-      when :*
-        method_proc = proc { |acum, n| acum * n }
-      when :/
-        method_proc = proc { |acum, n| acum / n }
-      when :**
-        method_proc = proc { |acum, n| acum**n }
-      end
+    initial.class == Symbol && operator.nil? && operator = initial
+    unless operator.nil?
+      op_proc = eval 'proc { |acum, n| acum ' + operator.to_s + 'n}'
     end
     my_each_with_index do |element, index|
       unless index.zero? && !initial_given
-        memo =  if block_given?
-                  yield(memo, element)
-                else
-                    method_proc.call(memo, element)
-                end
+        memo = block_given? ? yield(memo, element) : op_proc.call(memo, element)
       end
     end
     memo
