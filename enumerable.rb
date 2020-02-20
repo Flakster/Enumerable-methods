@@ -42,36 +42,50 @@ module Enumerable
 
   # definition of the my_all? method
 
-  def my_all?
-    return true unless block_given?
+  def my_all?(pattern = nil)
+    return true unless block_given? || !pattern.nil?
 
     my_each do |element|
-      return false unless yield(element)
+      if block_given?
+        return false unless yield(element)
+      elsif pattern.is_a?(Class) || pattern.is_a?(Regexp)
+        return false unless pattern === element
+      else
+        return false unless element == pattern
+      end
     end
     true
   end
 
   # definition of the my_none? method
 
-  def my_none?
-    return false unless block_given?
+  def my_none?(pattern = nil)
+    return false unless block_given || !pattern.nil?
 
     my_each do |element|
-      return false if yield(element)
+      if block_given?
+        return false if yield(element)
+      elsif pattern.is_a?(Class) || pattern.is_a?(Regexp)
+        return false if pattern === element
+      else
+        return false if element == pattern
+      end
     end
     true
   end
 
   # definition of the my_any? method
-
-  def my_any?
-    if block_given?
-      my_each do |element|
+  UNDEFINED = Object.new
+  def my_any?(pattern = UNDEFINED)
+    my_each do |element|
+      if block_given?
         return true if yield(element)
-      end
-    else
-      my_each do |element|
+      elsif pattern.is_a?(Class) || pattern.is_a?(Regexp)
+        return true if pattern === element
+      elsif pattern.equal?(UNDEFINED)
         return true if element
+      else
+        return true if element == pattern
       end
     end
     false
