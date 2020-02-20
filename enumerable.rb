@@ -48,9 +48,9 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
       elsif pattern.is_a?(Class) || pattern.is_a?(Regexp)
         return false unless pattern === element # rubocop:disable Style/CaseEquality
       elsif pattern.equal?(UNDEFINED)
-        return false unless element 
+        return false unless element
       elsif element != pattern
-        return false 
+        return false
       end
     end
     true
