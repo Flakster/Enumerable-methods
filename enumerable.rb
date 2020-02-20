@@ -2,6 +2,7 @@
 
 # Some methods will be added to this module
 module Enumerable # rubocop:disable Metrics/ModuleLength
+  UNDEFINED = Object.new
   # definition of the my_each method
 
   def my_each
@@ -40,16 +41,16 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
 
   # definition of the my_all? method
 
-  def my_all?(pattern = nil) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
-    return true unless block_given? || !pattern.nil?
-
+  def my_all?(pattern = UNDEFINED) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
     my_each do |element|
       if block_given?
         return false unless yield(element)
       elsif pattern.is_a?(Class) || pattern.is_a?(Regexp)
         return false unless pattern === element # rubocop:disable Style/CaseEquality
-      else
-        return false unless element == pattern
+      elsif pattern.equal?(UNDEFINED)
+        return false unless element 
+      elsif element != pattern
+        return false 
       end
     end
     true
@@ -57,14 +58,14 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
 
   # definition of the my_none? method
 
-  def my_none?(pattern = nil) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
-    return false unless block_given || !pattern.nil?
-
+  def my_none?(pattern = UNDEFINED) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
     my_each do |element|
       if block_given?
         return false if yield(element)
       elsif pattern.is_a?(Class) || pattern.is_a?(Regexp)
         return false if pattern === element # rubocop:disable Style/CaseEquality
+      elsif pattern.equal?(UNDEFINED)
+        return false if element
       elsif element == pattern
         return false
       end
@@ -74,7 +75,6 @@ module Enumerable # rubocop:disable Metrics/ModuleLength
 
   # definition of the my_any? method
 
-  UNDEFINED = Object.new
   def my_any?(pattern = UNDEFINED) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
     my_each do |element|
       if block_given?
