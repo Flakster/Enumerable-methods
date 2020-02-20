@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-# frozen_string_literal: true
-
 require './enumerable.rb'
 
 array1 = [1, 2, 3, 4]

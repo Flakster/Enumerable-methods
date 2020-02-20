@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 
-# frozen_string_literal: true
-
 # Some methods will be added to this module
-module Enumerable
+module Enumerable # rubocop:disable Metrics/ModuleLength
   # definition of the my_each method
 
   def my_each
@@ -42,14 +40,14 @@ module Enumerable
 
   # definition of the my_all? method
 
-  def my_all?(pattern = nil)
+  def my_all?(pattern = nil) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
     return true unless block_given? || !pattern.nil?
 
     my_each do |element|
       if block_given?
         return false unless yield(element)
       elsif pattern.is_a?(Class) || pattern.is_a?(Regexp)
-        return false unless pattern === element
+        return false unless pattern === element # rubocop:disable Style/CaseEquality
       else
         return false unless element == pattern
       end
@@ -59,33 +57,34 @@ module Enumerable
 
   # definition of the my_none? method
 
-  def my_none?(pattern = nil)
+  def my_none?(pattern = nil) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
     return false unless block_given || !pattern.nil?
 
     my_each do |element|
       if block_given?
         return false if yield(element)
       elsif pattern.is_a?(Class) || pattern.is_a?(Regexp)
-        return false if pattern === element
-      else
-        return false if element == pattern
+        return false if pattern === element # rubocop:disable Style/CaseEquality
+      elsif element == pattern
+        return false
       end
     end
     true
   end
 
   # definition of the my_any? method
+
   UNDEFINED = Object.new
-  def my_any?(pattern = UNDEFINED)
+  def my_any?(pattern = UNDEFINED) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
     my_each do |element|
       if block_given?
         return true if yield(element)
       elsif pattern.is_a?(Class) || pattern.is_a?(Regexp)
-        return true if pattern === element
+        return true if pattern === element # rubocop:disable Style/CaseEquality
       elsif pattern.equal?(UNDEFINED)
         return true if element
-      else
-        return true if element == pattern
+      elsif element == pattern
+        return true
       end
     end
     false
@@ -114,11 +113,11 @@ module Enumerable
     if arg_proc.nil?
       return to_enum(:my_map) unless block_given?
 
-      my_each do  |element|
+      my_each do |element|
         new_array << yield(element)
       end
     else
-      my_each do  |element|
+      my_each do |element|
         new_array << arg_proc.call(element)
       end
     end
@@ -127,7 +126,7 @@ module Enumerable
 
   # definition of the my_inject method
 
-  def my_inject(initial = nil, operator = nil)
+  def my_inject(initial = nil, operator = nil) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
     memo = first
     initial_given = false
     if !initial.nil? && initial.class != Symbol
@@ -135,9 +134,7 @@ module Enumerable
       initial_given = true
     end
     initial.class == Symbol && operator.nil? && operator = initial
-    unless operator.nil?
-      op_proc = eval 'proc { |acum, n| acum ' + operator.to_s + 'n}'
-    end
+    op_proc = eval 'proc { |acum, n| acum ' + operator.to_s + 'n}' unless operator.nil? # rubocop:disable Security/Eval
     my_each_with_index do |element, index|
       unless index.zero? && !initial_given
         memo = block_given? ? yield(memo, element) : op_proc.call(memo, element)
