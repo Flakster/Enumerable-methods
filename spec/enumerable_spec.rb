@@ -27,7 +27,7 @@ RSpec.describe Enumerable do
 
   describe '#my_select' do
     it 'returns an array with all the elements for which the given block is true' do
-      expect(arr3.my_select { |e| e.even? }).to eql([2, 4])
+      expect(arr3.my_select { |e| e.even? }).to eql([2, 4])# rubocop:disable Style/SymbolProc
     end
 
     it 'returns an enumerator if no block is given' do
@@ -91,7 +91,7 @@ RSpec.describe Enumerable do
     end
 
     it 'returns the number of elements that make true a given block' do
-      expect(arr3.my_count { |e| e.even? }).to eql(2)
+      expect(arr3.my_count { |e| e.even? }).to eql(2) # rubocop:disable Style/SymbolProc
     end
   end
 
