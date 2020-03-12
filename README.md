@@ -17,6 +17,10 @@ To get a local copy up and running follow these simple example steps:
     or\
     $ ./test.rb (requires permission to execute )
     
+# Running the tests
+
+For running the automated tests type rspec spec/enumerable_spec.rb in the root directory of the project
+    
 # Validators
 
 - Rubocop
